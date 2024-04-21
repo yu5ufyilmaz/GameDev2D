@@ -5,11 +5,12 @@ TagManager:
   serializedVersion: 2
   tags:
   - FxTemporaire
-  - Ortadaki_kutular
-  - GameControl
   - Player1Tower
   - Player2Tower
   - BoxInMid
+  - Ground
+  - Player1
+  - Player2
   layers:
   - Default
   - TransparentFX

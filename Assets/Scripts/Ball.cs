@@ -2,41 +2,43 @@
 
 public class Ball : MonoBehaviour
 {
-    float hitPower;
-    GameObject gameControl;
-
+    float _hitPower;
+    private GameObject Player;
     void Start()
     {
-        hitPower = 20;
-        gameControl = GameObject.FindWithTag("GameControl");
+        _hitPower = 20;
+        Player = GameObject.FindWithTag("Player1");
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-      
-
         if (collision.gameObject.CompareTag("BoxInMid"))
         {
-            collision.gameObject.GetComponent<BoxInMid>().TakeHit(hitPower);
-
-            gameControl.GetComponent<GameController>().CreateEffects(1,collision.gameObject);
-
+            collision.gameObject.GetComponent<BoxInMid>().TakeHit(_hitPower);
+            GameController.instance.CreateEffects(1,collision.gameObject);
+            Player.GetComponent<Player>().PlayPower();
             Destroy(gameObject);
-         
-          
         }
-        if (collision.gameObject.CompareTag("Player2Tower"))
+        
+        if (collision.gameObject.CompareTag("Player1Tower") || collision.gameObject.CompareTag("Player1"))
         {
-            gameControl.GetComponent<GameController>().CreateEffects(1, collision.gameObject);
-            gameControl.GetComponent<GameController>().Hit(2, hitPower);
+            GameController.instance.CreateEffects(1, collision.gameObject);
+            GameController.instance.Hit(1, _hitPower);
+            Player.GetComponent<Player>().PlayPower();
             Destroy(gameObject);
 
         }
-        if (collision.gameObject.CompareTag("Player1Tower"))
+        if (collision.gameObject.CompareTag("Player2Tower") || collision.gameObject.CompareTag("Player2"))
         {
-            gameControl.GetComponent<GameController>().CreateEffects(1, collision.gameObject);
-            gameControl.GetComponent<GameController>().Hit(1, hitPower);
+            GameController.instance.CreateEffects(1, collision.gameObject);
+            GameController.instance.Hit(2, _hitPower);
+            Player.GetComponent<Player>().PlayPower();
             Destroy(gameObject);
 
+        }
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            GameController.instance.CreateEffects(1, collision.gameObject);
+            Destroy(gameObject);
         }
     }
     

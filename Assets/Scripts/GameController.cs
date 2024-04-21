@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -18,7 +19,21 @@ public class GameController : MonoBehaviour
     float player1Health=100;
     public Image player2HealthBar;
     float player2Health=100;
-    
+
+    public static GameController instance;
+    private void Awake() 
+    { 
+        // Bir örnek varsa ve ben değilse, yoket.
+        
+        if (instance != null && instance != this) 
+        { 
+            Destroy(this);
+            return;
+        } 
+        instance = this;
+        DontDestroyOnLoad(this.gameObject);
+    }
+
     public void CreateEffects(int criterion,GameObject objectTransform)
     {
         switch (criterion)
