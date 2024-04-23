@@ -11,6 +11,46 @@ TagManager:
   - Ground
   - Player1
   - Player2
+  - Oyuncu_1
+  - Ortadaki_kutular
+  - GameKontrol
+  - Bullet
+  - Odul
+  - Top
+  - Tahta
+  - Oyuncu_1_isim
+  - OlusacakNokta_2
+  - OlusacakNokta_1
+  - OyunSonuBilgi
+  - OyunSonuPanel
+  - Zemin
+  - Oyuncu_2_Kule
+  - Oyuncu_2_isim
+  - Oyuncu_1_saglik_bar
+  - PowerBar
+  - Oyuncu_2_saglik_bar
+  - Oyuncu_1_Kule
+  - OyuncuBekleniyor
+  - Oda_kur_ve_gir
+  - Server_bilgi
+  - Ad_kaydet_buton
+  - Random_giris_yap
+  - SunucuYonetimi
+  - ServerManager
+  - CreatedDots1
+  - CreatedDots2
+  - WaitingPlayers
+  - EndGamePanel
+  - EndGameInfo
+  - Wood
+  - SaveNameButton
+  - RandomJoin
+  - CreateRoom
+  - ServerInfo
+  - Player1HealthBar
+  - Player1Name
+  - Player2HealthBar
+  - Player2Name
   layers:
   - Default
   - TransparentFX

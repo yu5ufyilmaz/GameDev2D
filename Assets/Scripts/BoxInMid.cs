@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -9,20 +10,52 @@ public class BoxInMid : MonoBehaviour
     float health = 100;
     public GameObject healthCanvas;
     public Image healthBar;    
-    public void TakeHit(float hitPower)
+
+    GameObject gameController;
+    PhotonView pw;
+    AudioSource crateBreakSound;
+
+    private void Start()
     {
-        health -= hitPower;
-        healthBar.fillAmount = health / 100; // 0.9
-        if (health<=0)
-        {
-            GameController.instance.CreateEffects(2,gameObject);
-            Destroy(gameObject);
-        }else
-        {
-            StartCoroutine(ActivateCanvas());
-        }
+        gameController = GameObject.FindWithTag("GameController");
+        pw = GetComponent<PhotonView>();
+        crateBreakSound = GetComponent<AudioSource>();
     }
-    IEnumerator ActivateCanvas()
+    [PunRPC]
+    public void GetHit(float hitPower)
+    {
+
+        if (pw.IsMine)
+        {
+
+            health -= hitPower;
+
+            healthBar.fillAmount = health / 100; // 0.9
+
+            if (health <= 0)
+            {
+
+               // gameController.GetComponent<GameController>().CreateSound(2, gameObject);
+
+                PhotonNetwork.Instantiate("CrateBreakEffect", transform.position, transform.rotation, 0, null);
+                crateBreakSound.Play();
+                PhotonNetwork.Destroy(gameObject);
+
+            }
+            else
+            {
+                StartCoroutine(RemoveCanvas());
+
+            }
+
+        }
+           
+
+        
+    }
+
+
+    IEnumerator RemoveCanvas()
     {
         if (!healthCanvas.activeInHierarchy)
         {
@@ -30,6 +63,7 @@ public class BoxInMid : MonoBehaviour
             yield return new WaitForSeconds(2);
             healthCanvas.SetActive(false);
         }
+
     }
  
 }
