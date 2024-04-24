@@ -1187,6 +1187,7 @@ MonoBehaviour:
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
+  m_UseLocal: 0
 --- !u!114 &242686729
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1202,13 +1203,13 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  observableSearch: 2
   Synchronization: 3
   OwnershipTransfer: 0
+  observableSearch: 2
   ObservedComponents:
   - {fileID: 242686728}
   - {fileID: 242686727}
-  viewIdField: 36
+  sceneViewId: 36
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!4 &242686730
@@ -2244,6 +2245,7 @@ MonoBehaviour:
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
+  m_UseLocal: 0
 --- !u!114 &422113728
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2259,12 +2261,12 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  observableSearch: 2
   Synchronization: 3
   OwnershipTransfer: 0
+  observableSearch: 2
   ObservedComponents:
   - {fileID: 422113727}
-  viewIdField: 38
+  sceneViewId: 38
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1001 &427714312
@@ -3183,6 +3185,7 @@ MonoBehaviour:
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
+  m_UseLocal: 0
 --- !u!114 &538629243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3198,13 +3201,13 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  observableSearch: 2
   Synchronization: 3
   OwnershipTransfer: 0
+  observableSearch: 2
   ObservedComponents:
   - {fileID: 538629242}
   - {fileID: 538629241}
-  viewIdField: 37
+  sceneViewId: 37
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!4 &538629244

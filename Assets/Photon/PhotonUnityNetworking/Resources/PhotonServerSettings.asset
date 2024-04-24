@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: PhotonServerSettings
   m_EditorClassIdentifier: 
   AppSettings:
-    AppIdRealtime: ed1d2961-b1ca-4872-9673-de2dc38ffe46
-    AppIdChat: 
+    AppIdRealtime: 02d7dcf6-5c50-41d5-a61b-a76a662c5bac
+    AppIdFusion: 
+    AppIdChat: 4493ca83-4639-454c-8a1a-7053b47101ca
     AppIdVoice: 
     AppVersion: 
     UseNameServer: 1
@@ -27,7 +28,7 @@ MonoBehaviour:
     AuthMode: 0
     EnableLobbyStatistics: 0
     NetworkLogging: 1
-  DevRegion: eu
+  DevRegion: tr
   PunLogging: 0
   EnableSupportLogger: 0
   RunInBackground: 1
@@ -36,22 +37,13 @@ MonoBehaviour:
   - ClickRpc
   - DestroyRpc
   - DestroySpaceship
+  - FillHealth
   - Fire
-  - RespawnSpaceship
-  - TagAktar
-  - darbeal
-  - Darbe_vur
-  - SaglikDoldur
-  - basla
-  - Basla
-  - CountDown
-  - galip
-  - maglup
+  - GetHit
   - HitDamage
+  - RespawnSpaceship
   - StartGame
   - TransferTag
-  - FillHealth
-  - GetHit
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

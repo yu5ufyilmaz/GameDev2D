@@ -102,10 +102,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa4ae109e1c7c644e8e994e913e1f52f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  top: {fileID: 5234325349085763737, guid: d6608c41997db3b4382c874802aca0c7, type: 3}
-  TopCikisnoktasi: {fileID: 2220338385282284854}
-  TopAtisEfekt: {fileID: 3999691475481238794, guid: 1d98f52b59cf21b4c838960a55baddf0, type: 3}
-  TopAtmaSesi: {fileID: 2220338384404966813}
+  ball: {fileID: 5234325349085763737, guid: d6608c41997db3b4382c874802aca0c7, type: 3}
+  ballSpawnPoint: {fileID: 2220338385282284854}
+  ballThrowEffect: {fileID: 6985993175571860890, guid: 51098ac0734771f438416ff4dd265005, type: 3}
+  ballThrowSound: {fileID: 2220338384404966813}
+  powerBar: {fileID: 0}
 --- !u!60 &2220338384404966814
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -358,12 +359,12 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  observableSearch: 2
   Synchronization: 3
   OwnershipTransfer: 0
+  observableSearch: 2
   ObservedComponents:
   - {fileID: 7884654169463831224}
-  viewIdField: 0
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &7884654169463831224
@@ -379,8 +380,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
+  m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
+  m_UseLocal: 0
 --- !u!1 &2220338385282284854
 GameObject:
   m_ObjectHideFlags: 0
@@ -391,7 +393,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2220338385282284853}
   m_Layer: 0
-  m_Name: TopCikisNoktasi
+  m_Name: BallSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

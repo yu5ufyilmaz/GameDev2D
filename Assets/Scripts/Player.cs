@@ -1,8 +1,6 @@
 ﻿using Photon.Pun;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class Player : MonoBehaviour
@@ -11,175 +9,139 @@ public class Player : MonoBehaviour
     public GameObject ballSpawnPoint;
     public ParticleSystem ballThrowEffect;
     public AudioSource ballThrowSound;
-    float shootingDirection;
-     
 
-   [Header("Power Bar Settings")]
-    Image powerBar;
-    float powerScore;    
-    bool isEnd=false;
-    Coroutine powerLoop;
+    private Image _powerBar;
 
-    PhotonView pw;
-    bool isFireActive=false;
-    void Start()
-    {      
+    private PhotonView _photonView;
+    private bool _isFireActive = true;
+    private Coroutine _powerLoop;
 
-        pw = GetComponent<PhotonView>();
+    private float _shootingDirection;
+    private bool _isEnd;
 
-        if (pw.IsMine)
-        {
-            powerBar = GameObject.FindWithTag("PowerBar").GetComponent<Image>();
-            if (PhotonNetwork.IsMasterClient)
-            {
-                gameObject.tag = "Player1";
-                transform.position = GameObject.FindWithTag("CreatedDots1").transform.position;
-                transform.rotation = GameObject.FindWithTag("CreatedDots1").transform.rotation;
-                shootingDirection = 2f;                
-            }
-            else
-            {
-                gameObject.tag = "Player2";
-                transform.position = GameObject.FindWithTag("CreatedDots2").transform.position;
-                transform.rotation = GameObject.FindWithTag("CreatedDots2").transform.rotation;
-                shootingDirection = -2f;
-                
-            }
-
-        }
-        InvokeRepeating("IsGameStarted", 0, .5f);
-
-    }
-    public void IsGameStarted()
+    private void Start()
     {
-        if (PhotonNetwork.PlayerList.Length == 2)
-        {
-            if (pw.IsMine)
-            {
-                powerLoop = StartCoroutine(RunPowerBar());
-                CancelInvoke("IsGameStarted");
+        _photonView = GetComponent<PhotonView>();
 
-            }
-           
-
-        }else
+        if (_photonView.IsMine)
         {
-            StopAllCoroutines();
+            SetupPlayer();
+            InvokeRepeating("CheckGameStart", 0, 0.5f);
         }
     }
-    IEnumerator RunPowerBar()
+
+    private void SetupPlayer()
     {
-        powerBar.fillAmount = 0;
-        isEnd = false;
-        isFireActive = true;
+        _powerBar = GameObject.FindWithTag("PowerBar").GetComponent<Image>();
 
-        while (true)
+        if (PhotonNetwork.IsMasterClient)
         {
-            if (powerBar.fillAmount < 1 && !isEnd)
-            {
-                powerScore = 0.01f;
-                powerBar.fillAmount += powerScore;
-                yield return new WaitForSeconds(0.001f * Time.deltaTime);
-
-            }else
-            {
-                isEnd = true;
-                powerScore = 0.01f;
-                powerBar.fillAmount -= powerScore;
-                yield return new WaitForSeconds(0.001f * Time.deltaTime);
-
-                if (powerBar.fillAmount==0)
-                {
-                    isEnd = false;
-
-                }
-
-            }
-
-
+            gameObject.tag = "Player1";
+            SetPlayerPositionAndDirection("CreatedDots1", 2f);
         }
-
+        else
+        {
+            gameObject.tag = "Player2";
+            SetPlayerPositionAndDirection("CreatedDots2", -2f);
+        }
     }
 
-    
-    
-    void Update()
+    private void SetPlayerPositionAndDirection(string dotsTag, float direction)
     {
-        
-        if (pw.IsMine)
-        {
-            if (Input.touchCount > 0 && isFireActive) 
-            {
-               
-                PhotonNetwork.Instantiate("BlowEffect", ballSpawnPoint.transform.position, ballSpawnPoint.transform.rotation, 0, null);
-                ballThrowSound.Play();
-                GameObject ballObject = PhotonNetwork.Instantiate("Ball", ballSpawnPoint.transform.position, ballSpawnPoint.transform.rotation, 0, null);
-
-
-                ballObject.GetComponent<PhotonView>().RPC("TransferTag",RpcTarget.All, gameObject.tag);
-
-                Rigidbody2D rg = ballObject.GetComponent<Rigidbody2D>();
-                rg.AddForce(new Vector2(shootingDirection, 0f) * powerBar.fillAmount * 12f, ForceMode2D.Impulse);
-                isFireActive = false;
-                StopCoroutine(powerLoop);
-                
-            }
-
-        }
-
-       
-
-        
+        Transform dotsTransform = GameObject.FindWithTag(dotsTag).transform;
+        transform.position = dotsTransform.position;
+        transform.rotation = dotsTransform.rotation;
+        _shootingDirection = direction;
     }
 
+    private void CheckGameStart()
+    {
+        if (!_isEnd && _powerBar.fillAmount < 1 && PhotonNetwork.PlayerList.Length == 2 && _photonView.IsMine)
+        {
+            if (_powerLoop == null)
+            {
+                _powerLoop = StartCoroutine(RunPowerBar());
+            }
+        }
+    }
+
+    private IEnumerator RunPowerBar()
+    {
+        _powerBar.fillAmount = 0;
+        _isEnd = false;
+        _isFireActive = true;
+
+        while (!_isEnd && _powerBar.fillAmount < 1)
+        {
+            _powerBar.fillAmount += 0.01f;
+            yield return new WaitForSeconds(0.001f);
+        }
+
+        if (_powerBar.fillAmount == 0)
+        {
+            _isEnd = false;
+        }
+    }
+
+    private void Update()
+    {
+        if (_photonView.IsMine && _isFireActive && (Input.touchCount > 0 || Input.GetKeyDown(KeyCode.Space)))
+        {
+            FireBall();
+        }
+    }
+
+    private void FireBall()
+    {
+        PhotonNetwork.Instantiate("BlowEffect", ballSpawnPoint.transform.position, ballSpawnPoint.transform.rotation);
+        ballThrowSound.Play();
+        GameObject ballObject = PhotonNetwork.Instantiate("Ball", ballSpawnPoint.transform.position, ballSpawnPoint.transform.rotation);
+        ballObject.GetComponent<PhotonView>().RPC("TransferTag", RpcTarget.AllBuffered, gameObject.tag);
+
+        Rigidbody2D rg = ballObject.GetComponent<Rigidbody2D>();
+        rg.AddForce(new Vector2(_shootingDirection, 0f) * _powerBar.fillAmount * 12f, ForceMode2D.Impulse);
+
+        _isFireActive = false;
+        StopCoroutine(_powerLoop);
+    }
 
     public void PowerPlay()
     {
-        powerLoop = StartCoroutine(RunPowerBar());
+        _powerLoop = StartCoroutine(RunPowerBar());
     }
-   
+
     public void Result(int value)
     {
-       
-        if (pw.IsMine)
+        if (_photonView.IsMine)
         {
+            PlayerPrefs.SetInt("TotalMatch", PlayerPrefs.GetInt("TotalMatch") + 1);
 
             if (PhotonNetwork.IsMasterClient)
+            {
+                if (value == 1)
                 {
-
-                if (value==1)
-                {
-                    PlayerPrefs.SetInt("TotalMatch", PlayerPrefs.GetInt("TotalMatch") + 1);
                     PlayerPrefs.SetInt("Win", PlayerPrefs.GetInt("Win") + 1);
                     PlayerPrefs.SetInt("TotalScore", PlayerPrefs.GetInt("TotalScore") + 150);
                 }
                 else
                 {
-                    PlayerPrefs.SetInt("TotalMatch", PlayerPrefs.GetInt("TotalMatch") + 1);
-                    PlayerPrefs.SetInt("Win", PlayerPrefs.GetInt("Win") + 1);
-
+                    PlayerPrefs.SetInt("Lose", PlayerPrefs.GetInt("Lose") + 1);
                 }
-
             }
             else
             {
-                
                 if (value == 2)
                 {
-                    PlayerPrefs.SetInt("TotalMatch", PlayerPrefs.GetInt("TotalMatch") + 1);
-                    PlayerPrefs.SetInt("Win", PlayerPrefs.GetInt("Galibiyet") + 1);
+                    PlayerPrefs.SetInt("Win", PlayerPrefs.GetInt("Win") + 1);
                     PlayerPrefs.SetInt("TotalScore", PlayerPrefs.GetInt("TotalScore") + 150);
                 }
                 else
                 {
-                    PlayerPrefs.SetInt("TotalMatch", PlayerPrefs.GetInt("TotalMatch") + 1);
                     PlayerPrefs.SetInt("Lose", PlayerPrefs.GetInt("Lose") + 1);
-
                 }
-
-
             }
         }
-        Time.timeScale = 0;
+
+        // Oyun zamanını durdurma yerine farklı bir yöntem kullanılabilir
     }
 }

@@ -1,200 +1,149 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using TMPro;
-using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
-using Random = UnityEngine.Random;
 
-public class GameController : MonoBehaviour
+public class GameController : MonoBehaviourPunCallbacks
 {
-
-
-    [FormerlySerializedAs("Player1HealthBar")] [Header("Player Health Settings")]
+    [Header("Player Health Settings")]
     public Image player1HealthBar;
-    float player1Health = 100;
-    [FormerlySerializedAs("Player2HealthBar")] public Image player2HealthBar;
-    float player2Health = 100;
-    PhotonView pw;
+    public Image player2HealthBar;
+    private float player1Health = 100;
+    private float player2Health = 100;
 
-    bool isWeStarted;
-    int limit;
-    float waitingTime;
-    int createCount;
+    private bool isGameStarted = false;
+    private int createCount = 0;
+    private int rewardLimit = 4;
+    private float createInterval = 15f;
+
     public GameObject[] dots;
-    GameObject player1;
-    GameObject player2;
-
-    bool isGameEnd = false;
-    
 
     private void Start()
     {
-        pw = GetComponent<PhotonView>();
-        isWeStarted = false;
-        limit = 4;
-        waitingTime = 5f;
+        StartCoroutine(StartCreateRewards());
     }
 
-
-    IEnumerator StartCreate()
+    private IEnumerator StartCreateRewards()
     {
         createCount = 0;
 
-        while (true && isWeStarted)
+        while (isGameStarted && createCount < rewardLimit)
         {
-            if (limit == createCount)
-                isWeStarted = false;
+            yield return new WaitForSeconds(createInterval);
 
-            yield return new WaitForSeconds(15f);
-            int resultValue = Random.Range(0, 7);
-            PhotonNetwork.Instantiate("Reward", dots[resultValue].transform.position, dots[resultValue].transform.rotation, 0, null);
-            createCount++;
+            if (createCount < rewardLimit)
+            {
+                int randomIndex = Random.Range(0, dots.Length);
+                PhotonNetwork.Instantiate("Reward", dots[randomIndex].transform.position, dots[randomIndex].transform.rotation);
+                createCount++;
+            }
         }
-
     }
+
     [PunRPC]
-    public void StartGame() 
+    public void StartGame()
     {
         if (PhotonNetwork.IsMasterClient)
-                isWeStarted = true;
-                StartCoroutine(StartCreate());
-       
+        {
+            isGameStarted = true;
+            StartCoroutine(StartCreateRewards());
+        }
     }
 
     [PunRPC]
-    public void HitDamage(int criterion,float hitPower)
+    public void HitDamage(int playerNumber, float hitPower)
     {
-
-        switch (criterion) 
+        if (playerNumber == 1)
         {
+            player1Health -= hitPower;
+            player1HealthBar.fillAmount = player1Health / 100f;
 
-            case 1:
-                
-                    player1Health -= hitPower;
+            if (player1Health <= 0)
+            {
+                HandleGameEnd(2); // Player 2 wins
+            }
+        }
+        else if (playerNumber == 2)
+        {
+            player2Health -= hitPower;
+            player2HealthBar.fillAmount = player2Health / 100f;
 
-                    player1HealthBar.fillAmount = player1Health / 100;
+            if (player2Health <= 0)
+            {
+                HandleGameEnd(1); // Player 1 wins
+            }
+        }
+    }
 
-                    if (player1Health <= 0)
-                    {
+    private void HandleGameEnd(int winningPlayer)
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
 
-
-                    foreach (GameObject myObject in Resources.FindObjectsOfTypeAll(typeof(GameObject)) as GameObject[])
-                    {
-                        if (myObject.gameObject.CompareTag("EndGamePanel"))
-                        {
-                            myObject.gameObject.SetActive(true);
-                            GameObject.FindWithTag("EndGameInfo").GetComponent<TextMeshProUGUI>().text= "2. Player Won";
-                            
-
-                        }
-
-
-                    }
-
-                    Winner(2);                 
-
-                     }
-               
-                break;
-            case 2:                
-
-                    player2Health -= hitPower;
-
-                    player2HealthBar.fillAmount = player2Health / 100;
-
-                    if (player2Health <= 0)
-                    {
-
-                    foreach (GameObject objem in Resources.FindObjectsOfTypeAll(typeof(GameObject)) as GameObject[])
-                    {
-                        if (objem.gameObject.CompareTag("EndGamePanel"))
-                        {
-                            objem.gameObject.SetActive(true);
-                            GameObject.FindWithTag("EndGameInfo").GetComponent<TextMeshProUGUI>().text = "1.Player Won";
-
-
-                        }
-
-
-                    }
-
-                    Winner(1);
-                 
-                    
-                     }
-                break;
-
+        // Show end game panel
+        GameObject endGamePanel = GameObject.FindGameObjectWithTag("EndGamePanel");
+        if (endGamePanel != null)
+        {
+            endGamePanel.SetActive(true);
+            TextMeshProUGUI endGameInfo = endGamePanel.GetComponentInChildren<TextMeshProUGUI>();
+            endGameInfo.text = winningPlayer == 1 ? "Player 1 Won" : "Player 2 Won";
         }
 
+        // Trigger game end actions
+        Winner(winningPlayer);
     }
+
+    private void Winner(int winningPlayer)
+    {
+        // Inform both players about game result
+        photonView.RPC("Result", RpcTarget.All, winningPlayer);
+
+        // Prevent further game actions
+        isGameStarted = false;
+    }
+
+    [PunRPC]
+    public void FillHealth(int playerNumber)
+    {
+        if (playerNumber == 1)
+        {
+            player1Health += 30f;
+            if (player1Health > 100f)
+                player1Health = 100f;
+
+            player1HealthBar.fillAmount = player1Health / 100f;
+        }
+        else if (playerNumber == 2)
+        {
+            player2Health += 30f;
+            if (player2Health > 100f)
+                player2Health = 100f;
+
+            player2HealthBar.fillAmount = player2Health / 100f;
+        }
+    }
+
+    [PunRPC]
     public void MainMenu()
     {
-        GameObject.FindWithTag("ServerManager").GetComponent<ServerManager>().isWithButton = true;
+        GameObject.FindGameObjectWithTag("ServerManager").GetComponent<ServerManager>().isWithButton = true;
         PhotonNetwork.LoadLevel(0);
-       
     }
+
+    [PunRPC]
     public void NormalExit()
     {
-       
         PhotonNetwork.LoadLevel(0);
-
     }
 
-
-    void Winner(int value)
-    {
-
-        if (!isGameEnd)
-        {
-            GameObject.FindWithTag("Player1").GetComponent<Player>().Result(value);
-            GameObject.FindWithTag("Player2").GetComponent<Player>().Result(value);
-            isGameEnd = true;
-        }
-
-        
-
-    }
     [PunRPC]
-    public void FillHealth(int whichPlayer)
+    public void Result(int winningPlayer)
     {
-        switch (whichPlayer)
+        if (PhotonNetwork.IsMasterClient)
         {
-
-            case 1:
-                player1Health += 30;
-
-                if (player1Health > 100)
-                {
-                    player1Health = 100;
-                    player1HealthBar.fillAmount = player1Health / 100;
-
-                }
-                else
-                {
-                    player1HealthBar.fillAmount = player1Health / 100;
-                }
-                break;
-            
-            case 2:
-                player2Health += 30;
-
-                if (player2Health > 100)
-                {
-                    player2Health = 100;
-                    player2HealthBar.fillAmount = player2Health / 100;
-
-                }
-                else
-                {
-                    player2HealthBar.fillAmount = player2Health / 100;
-                }
-                break;
-
+            GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>().Result(winningPlayer);
+            GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>().Result(winningPlayer);
         }
-
     }
 }
