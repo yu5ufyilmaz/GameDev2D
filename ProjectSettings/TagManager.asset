@@ -28,6 +28,9 @@ TagManager:
   - Player1Name
   - Player2HealthBar
   - Player2Name
+  - GameKontrol
+  - Ball
+  - Reward
   layers:
   - Default
   - TransparentFX
