@@ -44,6 +44,9 @@ MonoBehaviour:
   - RespawnSpaceship
   - StartGame
   - TransferTag
+  - MainMenu
+  - NormalExit
+  - Result
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
