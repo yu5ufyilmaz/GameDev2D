@@ -132,6 +132,7 @@ public class ServerManager : MonoBehaviourPunCallbacks
 
 
         // Debug.Log("Rakip Çıktı");
+        // bir oyuncu çıktıysa
         InvokeRepeating("CheckInfos", 0, 1f);
 
     }

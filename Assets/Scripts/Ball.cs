@@ -1,23 +1,26 @@
 ﻿using Photon.Pun;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
-    private float hitPower = 20f;
-    private int whoAmI; // 1 for Player1, 2 for Player2
+    float hitPower;
+    int whoAmI;
 
-    private GameObject gameController;
-    private GameObject player;
-    private PhotonView pv;
-    private AudioSource destroySound;
 
-    private void Start()
+    GameObject gameController;
+    GameObject player;
+    PhotonView pw;
+    AudioSource destroySound;
+    
+    void Start()
     {
+        hitPower = 20;
         gameController = GameObject.FindWithTag("GameController");
-        pv = GetComponent<PhotonView>();
+        pw = GetComponent<PhotonView>();
         destroySound = GetComponent<AudioSource>();
     }
-
     [PunRPC]
     public void TransferTag(string upcomingTag)
     {
@@ -25,52 +28,109 @@ public class Ball : MonoBehaviour
 
         if (upcomingTag == "Player1")
             whoAmI = 1;
-        else if (upcomingTag == "Player2")
+        else
             whoAmI = 2;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (pv.IsMine)
+
+
+        if (collision.gameObject.CompareTag("BoxInMid"))
         {
-            switch (collision.gameObject.tag)
+            collision.gameObject.GetComponent<PhotonView>().RPC("GetHit", RpcTarget.All, hitPower);
+            player.GetComponent<Player>().PowerPlay();
+
+
+            PhotonNetwork.Instantiate("SmokeEffect", transform.position, transform.rotation, 0, null);
+            destroySound.Play();
+            if (pw.IsMine)
+                PhotonNetwork.Destroy(gameObject);
+
+
+        }
+        if (collision.gameObject.CompareTag("Player2Tower") || collision.gameObject.CompareTag("Player2"))
+        {
+            if (whoAmI != 2)
             {
-                case "BoxInMid":
-                    collision.gameObject.GetComponent<PhotonView>().RPC("GetHit", RpcTarget.All, hitPower);
-                    break;
+                gameController.GetComponent<PhotonView>().RPC("HitDamage", RpcTarget.All, 2, hitPower);
 
-                case "Player2Tower":
-                case "Player2":
-                    if (whoAmI != 2)
-                        gameController.GetComponent<PhotonView>().RPC("HitDamage", RpcTarget.All, 2, hitPower);
-                    break;
-
-                case "Player1Tower":
-                case "Player1":
-                    if (whoAmI != 1)
-                        gameController.GetComponent<PhotonView>().RPC("HitDamage", RpcTarget.All, 1, hitPower);
-                    break;
-
-                case "Ground":
-                case "Wood":
-                    // Damage handling or effects for hitting ground or wood (optional)
-                    break;
-
-                case "Reward":
-                    gameController.GetComponent<PhotonView>().RPC("FillHealth", RpcTarget.All, whoAmI);
-                    PhotonNetwork.Destroy(collision.gameObject);
-                    break;
-
-                case "Ball":
-                    // Collision handling for another ball (optional)
-                    break;
             }
 
-            // Common actions for all collisions
             player.GetComponent<Player>().PowerPlay();
-            PhotonNetwork.Instantiate("SmokeEffect", transform.position, transform.rotation);
+
+
+            PhotonNetwork.Instantiate("SmokeEffect", transform.position, transform.rotation, 0, null);
             destroySound.Play();
-            PhotonNetwork.Destroy(gameObject);
+            if (pw.IsMine)
+                PhotonNetwork.Destroy(gameObject);
+
         }
+        if (collision.gameObject.CompareTag("Player1Tower") || collision.gameObject.CompareTag("Player1"))
+        {
+            if (whoAmI != 1)
+            {
+                gameController.GetComponent<PhotonView>().RPC("HitDamage", RpcTarget.All, 1, hitPower);
+
+            }
+            player.GetComponent<Player>().PowerPlay();
+            PhotonNetwork.Instantiate("SmokeEffect", transform.position, transform.rotation, 0, null);
+            destroySound.Play();
+            if (pw.IsMine)
+                PhotonNetwork.Destroy(gameObject);
+
+        }
+
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+
+            player.GetComponent<Player>().PowerPlay();
+            PhotonNetwork.Instantiate("SmokeEffect", transform.position, transform.rotation, 0, null);
+            destroySound.Play();
+            if (pw.IsMine)
+                PhotonNetwork.Destroy(gameObject);
+
+        }
+
+        if (collision.gameObject.CompareTag("Wood"))
+        {
+
+            player.GetComponent<Player>().PowerPlay();
+            PhotonNetwork.Instantiate("SmokeEffect", transform.position, transform.rotation, 0, null);
+            destroySound.Play();
+            if (pw.IsMine)
+                PhotonNetwork.Destroy(gameObject);
+
+        }
+
+        if (collision.gameObject.CompareTag("Reward"))
+        {
+            gameController.GetComponent<PhotonView>().RPC("FillHealth", RpcTarget.All, whoAmI);
+            PhotonNetwork.Destroy(collision.transform.gameObject);
+            player.GetComponent<Player>().PowerPlay();
+            PhotonNetwork.Instantiate("SmokeEffect", transform.position, transform.rotation, 0, null);
+            destroySound.Play();
+            if (pw.IsMine)
+                PhotonNetwork.Destroy(gameObject);
+
+        }
+
+        if (collision.gameObject.CompareTag("Ball"))
+        {
+
+            player.GetComponent<Player>().PowerPlay();
+
+            PhotonNetwork.Instantiate("SmokeEffect", transform.position, transform.rotation, 0, null);
+            destroySound.Play();
+            if (pw.IsMine)
+                PhotonNetwork.Destroy(gameObject);
+
+        }
+
+
+
     }
+
+
+
 }

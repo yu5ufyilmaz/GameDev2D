@@ -1,24 +1,22 @@
 ﻿using Photon.Pun;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Reward : MonoBehaviour
 {
-    private PhotonView _photonView;
-
-    private void Start()
+    PhotonView pw;
+    void Start()
     {
-        _photonView = GetComponent<PhotonView>();
-        StartCoroutine(DisappearAfterDelay());
+        pw = GetComponent<PhotonView>();
+        StartCoroutine(Disappear());
     }
 
-    private IEnumerator DisappearAfterDelay()
+    IEnumerator Disappear()
     {
+
         yield return new WaitForSeconds(10f);
-        
-        if (_photonView.IsMine)
-        {
+        if(pw.IsMine)
             PhotonNetwork.Destroy(gameObject);
-        }
     }
 }

@@ -1,93 +1,69 @@
 ﻿using Photon.Pun;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class BoxInMid : MonoBehaviour
 {
-    private float health = 100f;
+    float health = 100;
     public GameObject healthCanvas;
-    public Image healthBar;
+    public Image healthBar;    
 
-    private PhotonView photonView;
-    private AudioSource crateBreakSound;
+    GameObject gameController;
+    PhotonView pw;
+    AudioSource crateBreakSound;
 
     private void Start()
     {
-        photonView = GetComponent<PhotonView>();
+        gameController = GameObject.FindWithTag("GameController");
+        pw = GetComponent<PhotonView>();
         crateBreakSound = GetComponent<AudioSource>();
-
-        // Sağlık çubuğunu başlangıçta güncelle
-        UpdateHealthBar();
     }
-
     [PunRPC]
     public void GetHit(float hitPower)
     {
-        if (photonView.IsMine)
-        {
-            // Hasar al ve sağlık çubuğunu güncelle
-            health -= hitPower;
-            UpdateHealthBar();
 
-            if (health <= 0f)
+        if (pw.IsMine)
+        {
+
+            health -= hitPower;
+
+            healthBar.fillAmount = health / 100; // 0.9
+
+            if (health <= 0)
             {
-                // Kutu yok edilir
-                DestroyBox();
+
+                // gameController.GetComponent<GameController>().CreateSound(2, gameObject);
+
+                PhotonNetwork.Instantiate("CrateBreakEffect", transform.position, transform.rotation, 0, null);
+                crateBreakSound.Play();
+                PhotonNetwork.Destroy(gameObject);
+
             }
             else
             {
-                // Hasar aldıktan sonra sağlık çubuğunu göster
-                ShowHealthCanvas();
+                StartCoroutine(RemoveCanvas());
+
             }
+
         }
+           
+
+        
     }
 
-    private void UpdateHealthBar()
+
+    IEnumerator RemoveCanvas()
     {
-        // Sağlık çubuğunu güncelle
-        healthBar.fillAmount = health / 100f;
-    }
-
-    private void DestroyBox()
-    {
-        if (photonView.IsMine)
-        {
-            // Kutuyu yok etme efektini ve sesini oynat
-            PlayDestroyEffects();
-
-            // Kutuyu ağ üzerinden yok et
-            PhotonNetwork.Destroy(gameObject);
-        }
-    }
-
-    private void PlayDestroyEffects()
-    {
-        // Kırılma efektini ağ üzerinden oluştur
-        PhotonNetwork.Instantiate("CrateBreakEffect", transform.position, transform.rotation);
-
-        // Ses efektini oynat
-        if (crateBreakSound != null)
-            crateBreakSound.Play();
-    }
-
-    private void ShowHealthCanvas()
-    {
-        // Sağlık çubuğunu göster ve belirli bir süre sonra gizle
-        if (healthCanvas != null && !healthCanvas.activeSelf)
+        if (!healthCanvas.activeInHierarchy)
         {
             healthCanvas.SetActive(true);
-            StartCoroutine(HideHealthCanvas());
-        }
-    }
-
-    private IEnumerator HideHealthCanvas()
-    {
-        // Belirli bir süre sonra sağlık çubuğunu gizle
-        yield return new WaitForSeconds(2f);
-        if (healthCanvas != null && healthCanvas.activeSelf)
-        {
+            yield return new WaitForSeconds(2);
             healthCanvas.SetActive(false);
         }
+
     }
+ 
 }

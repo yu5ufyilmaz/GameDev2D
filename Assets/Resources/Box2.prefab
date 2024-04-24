@@ -176,8 +176,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c874948d7c93aa54384f09b00d467939, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  "SaglikCanvas\u0131": {fileID: 6060398441410122703}
-  healtBar: {fileID: 2145986702649923807}
+  healthCanvas: {fileID: 6060398441410122703}
+  healthBar: {fileID: 2145986702649923807}
 --- !u!114 &1347973600945382420
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,13 +193,13 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  observableSearch: 2
   Synchronization: 3
   OwnershipTransfer: 0
+  observableSearch: 2
   ObservedComponents:
   - {fileID: -831732102575284686}
   - {fileID: -7084807533793734114}
-  viewIdField: 0
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &-831732102575284686
@@ -217,6 +217,7 @@ MonoBehaviour:
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
+  m_UseLocal: 0
 --- !u!114 &-7084807533793734114
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class MainMenuController : MonoBehaviour
@@ -12,68 +13,53 @@ public class MainMenuController : MonoBehaviour
     public Text activeUsername;
     public TextMeshProUGUI[] statistic;
     public Text serverInfo;
+    GameObject randomJoin;
+    GameObject createRoom;
 
-    private void Start()
+    void Start()
     {
-        InitializePlayerPrefs();
-    }
+        
 
-    private void InitializePlayerPrefs()
-    {
         if (!PlayerPrefs.HasKey("Username"))
         {
-            // Yeni bir kullanıcı için varsayılan değerler ayarla
             PlayerPrefs.SetInt("TotalMatch", 0);
             PlayerPrefs.SetInt("Lose", 0);
             PlayerPrefs.SetInt("Win", 0);
             PlayerPrefs.SetInt("TotalScore", 0);
 
-            // İlk paneli aktif hale getir ve kullanıcı adı girişi yap
             firstPanel.SetActive(true);
+            EnterValues();
+
         }
         else
         {
-            // Kayıtlı bir kullanıcı varsa ikinci paneli aktif hale getir
             secondPanel.SetActive(true);
-            activeUsername.text = PlayerPrefs.GetString("Username");
+            activeUsername.text = PlayerPrefs.GetString("Usernam");
+            EnterValues();
         }
-
-        // İstatistikleri güncelle
-        UpdateStatistics();
+        
     }
 
     public void SaveUsername()
     {
-        // Kullanıcı adını kaydet
-        string enteredUsername = username.text;
-        if (string.IsNullOrEmpty(enteredUsername))
-        {
-            // Kullanıcı adı boşsa işlem yapma
-            Debug.LogWarning("Kullanıcı adı boş olamaz!");
-            return;
-        }
+       
+        PlayerPrefs.SetString("Username", username.text);
 
-        PlayerPrefs.SetString("Username", enteredUsername);
-
-        // Panel geçişleri ve kullanıcı adı güncellemesi
         firstPanel.SetActive(false);
         secondPanel.SetActive(true);
-        activeUsername.text = enteredUsername;
+        activeUsername.text = username.text;
+        randomJoin = GameObject.FindWithTag("RandomJoin");
+        createRoom = GameObject.FindWithTag("CreateRoom");
+        randomJoin.GetComponent<Button>().interactable = true;
+        createRoom.GetComponent<Button>().interactable = true;
+
     }
 
-    private void UpdateStatistics()
+    void EnterValues()
     {
-        // Kayıtlı istatistikleri görüntüle
-        statistic[0].text = PlayerPrefs.GetInt("TotalMatch", 0).ToString();
-        statistic[1].text = PlayerPrefs.GetInt("Lose", 0).ToString();
-        statistic[2].text = PlayerPrefs.GetInt("Win", 0).ToString();
-        statistic[3].text = PlayerPrefs.GetInt("TotalScore", 0).ToString();
-    }
-
-    public void ResetPlayerPrefs()
-    {
-        // Oyun istatistiklerini sıfırla (test amaçlı)
-        PlayerPrefs.DeleteAll();
-        InitializePlayerPrefs(); // Yeniden başlat
+        statistic[0].text = PlayerPrefs.GetInt("TotalMatch").ToString();
+        statistic[1].text = PlayerPrefs.GetInt("Lose").ToString();
+        statistic[2].text = PlayerPrefs.GetInt("Win").ToString();
+        statistic[3].text = PlayerPrefs.GetInt("TotalScore").ToString();
     }
 }
