@@ -79,9 +79,9 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 1a4674ce56455624ea3d9ebce1819f1e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6cb4d5af1bbd848468109f48ba33666d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.89411765}
-  m_FlipX: 0
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 5.12, y: 5.07}
@@ -106,7 +106,6 @@ MonoBehaviour:
   ballSpawnPoint: {fileID: 2220338385282284854}
   ballThrowEffect: {fileID: 6985993175571860890, guid: 51098ac0734771f438416ff4dd265005, type: 3}
   ballThrowSound: {fileID: 2220338384404966813}
-  powerBar: {fileID: 0}
 --- !u!60 &2220338384404966814
 PolygonCollider2D:
   m_ObjectHideFlags: 0
